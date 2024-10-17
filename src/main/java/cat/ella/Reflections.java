@@ -46,15 +46,15 @@ public class Reflections {
         try {
             final File jarFile = new File(callingClass.getProtectionDomain().getCodeSource().getLocation().getPath());
             if (jarFile.isFile()) {
-                try (JarFile jar = new JarFile(jarFile)) {
-                    jar.stream()
-                            .filter(entry -> entry.getName().contains(".class"))
-                            .map(JarEntry::getName)
-                            .forEach(paths::add);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                JarFile jar = new JarFile(jarFile);
+                Enumeration<JarEntry> entries = jar.entries();
+                while (entries.hasMoreElements()) {
+                    JarEntry entry = entries.nextElement();
+                    System.out.println(entry.getName());
 
+                    paths.add(entry.getName());
+                }
+                jar.close();
             } else { // Running from IDEs
                 InputStream inputStream = getClass().getClassLoader().getResourceAsStream("");
                 if (inputStream != null) {

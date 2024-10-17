@@ -25,16 +25,24 @@ public class Reflections {
 
     public List<Method> getMethodsAnnotatedWith(Class<? extends Annotation> annotation) {
         List<Method> methods = new ArrayList<>();
+        Set<Class<?>> processedClasses = new HashSet<>();
 
         for (Class<?> presentClass : presentClasses) {
-            for (Method method : presentClass.getDeclaredMethods()) {
+            if (!processedClasses.add(presentClass)) {
+                continue;
+            }
+
+            Method[] declaredMethods = presentClass.getDeclaredMethods();
+            for (Method method : declaredMethods) {
                 if (method.isAnnotationPresent(annotation)) {
                     methods.add(method);
                 }
             }
         }
+
         return methods;
     }
+
 
     private Collection<String> captureFilePaths(String localPath) {
         Set<String> paths = new HashSet<>();
@@ -45,7 +53,7 @@ public class Reflections {
                 Enumeration<JarEntry> entries = jar.entries();
                 while (entries.hasMoreElements()) {
                     JarEntry entry = entries.nextElement();
-                    if (entry.isDirectory() || !entry.getName().endsWith(".class")) continue;
+                    if (entry.isDirectory() || !entry.getName().endsWith(".class") || paths.contains(entry.getName())) continue;
                     paths.add(entry.getName());
                 }
             } else { // Running from IDEs

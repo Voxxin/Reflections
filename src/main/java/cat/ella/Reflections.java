@@ -1,9 +1,6 @@
 package cat.ella;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -48,16 +45,18 @@ public class Reflections {
         Set<String> paths = new HashSet<>();
         try {
             final File jarFile = new File(callingClass.getProtectionDomain().getCodeSource().getLocation().getPath());
-            if (jarFile.isFile()) { // Running from JAR
-                JarFile jar = new JarFile(jarFile);
-                Enumeration<JarEntry> entries = jar.entries();
-                while (entries.hasMoreElements()) {
-                    JarEntry entry = entries.nextElement();
-                    if (!entry.isDirectory() && entry.getName().endsWith(".class") && !paths.contains(entry.getName())) continue;
-                    paths.add(entry.getName());
+            if (jarFile.isFile()) {
+                try (JarFile jar = new JarFile(jarFile)) {
+                    jar.stream()
+                            .filter(entry -> !entry.isDirectory() && entry.getName().endsWith(".class"))
+                            .map(JarEntry::getName)
+                            .forEach(paths::add);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+
             } else { // Running from IDEs
-                InputStream inputStream = callingClass.getClassLoader().getResourceAsStream("");
+                InputStream inputStream = getClass().getClassLoader().getResourceAsStream("");
                 if (inputStream != null) {
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
                         String line;
@@ -74,7 +73,6 @@ public class Reflections {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
 
 
         return paths;

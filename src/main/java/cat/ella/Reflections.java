@@ -55,9 +55,7 @@ public class Reflections {
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
                         String line;
                         while ((line = reader.readLine()) != null) {
-                            System.out.println("Line: " + line);
-                            // Check if the line contains a file path
-                            if (line.contains(".java") || line.contains(".class")) {
+                            if (line.contains(".class")) {
                                 paths.add(localPath + line);
                             } else {
                                 paths.addAll(captureFilePaths(localPath + line + "/"));

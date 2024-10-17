@@ -26,6 +26,14 @@ public class Reflections {
     public List<Method> getMethodsAnnotatedWith(Class<? extends Annotation> annotation) {
         List<Method> methods = new ArrayList<>();
 
+        for (Class<?> presentClass : presentClasses) {
+            for (Method method : presentClass.getDeclaredMethods()) {
+                if (method.isAnnotationPresent(annotation)) {
+                    methods.add(method);
+                }
+            }
+        }
+        return methods;
     }
 
     private Collection<String> captureFilePaths(String localPath) {
@@ -49,7 +57,7 @@ public class Reflections {
                         while ((line = reader.readLine()) != null) {
                             System.out.println("Line: " + line);
                             // Check if the line contains a file path
-                            if (line.contains(".java") || line.contains(".class")) {
+                            if (line.contains(".class")) {
                                 paths.add(localPath + line);
                             } else {
                                 paths.addAll(captureFilePaths(localPath + line + "/"));

@@ -1,10 +1,18 @@
 import cat.ella.Reflections;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Method;
+import java.util.Collection;
+
 public class reflectionstest {
 
     @Test
     public void test() {
-        new Reflections(Reflections.class);
+        Reflections reflections = new Reflections(Reflections.class);
+        Collection<Method> methods = reflections.getMethodsAnnotatedWith(Test.class);
+
+        for (Method method : methods) {
+            System.out.println(method.getName());
+        }
     }
 }

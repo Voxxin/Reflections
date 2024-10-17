@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -12,16 +14,26 @@ import java.util.stream.Collectors;
 public class Reflections {
 
     private final Class<?> callingClass;
+    private Collection<Class<?>> presentClasses = new HashSet<>();
 
     public Reflections(Class<?> callingClass) {
         this.callingClass = callingClass;
 
         Collection<String> paths = captureFilePaths("");
-        Collection<Class<?>> classes = captureClassPaths(paths);
+        this.presentClasses = captureClassPaths(paths);
+    }
 
-        for (Class<?> path : classes) {
-            System.out.println(path);
+    public List<Method> getMethodsAnnotatedWith(Class<? extends Annotation> annotation) {
+        List<Method> methods = new ArrayList<>();
+
+        for (Class<?> presentClass : presentClasses) {
+            for (Method method : presentClass.getDeclaredMethods()) {
+                if (method.isAnnotationPresent(annotation)) {
+                    methods.add(method);
+                }
+            }
         }
+        return methods;
     }
 
     private Collection<String> captureFilePaths(String localPath) {
@@ -38,11 +50,19 @@ public class Reflections {
                     );
                 }
             } else { // Running from IDEs
-                InputStream inputStream = getClass().getClassLoader().getResourceAsStream(localPath);
+                InputStream inputStream = callingClass.getClassLoader().getResourceAsStream("");
                 if (inputStream != null) {
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-                        reader.lines().forEach(p -> paths.addAll(p.contains(".") ?
-                                List.of(localPath + p) : captureFilePaths(localPath + p + "/")));
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            System.out.println("Line: " + line);
+                            // Check if the line contains a file path
+                            if (line.contains(".java") || line.contains(".class")) {
+                                paths.add(localPath + line);
+                            } else {
+                                paths.addAll(captureFilePaths(localPath + line + "/"));
+                            }
+                        }
                     }
                 }
             }

@@ -48,7 +48,7 @@ public class Reflections {
             if (jarFile.isFile()) {
                 try (JarFile jar = new JarFile(jarFile)) {
                     jar.stream()
-                            .filter(entry -> !entry.isDirectory() && entry.getName().endsWith(".class"))
+                            .filter(entry -> entry.getName().endsWith(".class"))
                             .map(JarEntry::getName)
                             .forEach(paths::add);
                 } catch (IOException e) {
@@ -56,7 +56,7 @@ public class Reflections {
                 }
 
             } else { // Running from IDEs
-                InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("");
+                InputStream inputStream = getClass().getClassLoader().getResourceAsStream("");
                 if (inputStream != null) {
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
                         String line;

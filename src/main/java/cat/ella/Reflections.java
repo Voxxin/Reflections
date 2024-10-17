@@ -48,7 +48,7 @@ public class Reflections {
             if (jarFile.isFile()) {
                 try (JarFile jar = new JarFile(jarFile)) {
                     jar.stream()
-                            .filter(entry -> !entry.isDirectory() && entry.getName().endsWith(".class"))
+                            .filter(entry -> entry.getName().contains(".class"))
                             .map(JarEntry::getName)
                             .forEach(paths::add);
                 } catch (IOException e) {

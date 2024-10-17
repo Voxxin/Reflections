@@ -45,7 +45,7 @@ public class Reflections {
                 Enumeration<JarEntry> entries = jar.entries();
                 while (entries.hasMoreElements()) {
                     JarEntry entry = entries.nextElement();
-                    if (entry.isDirectory() || !entry.getName().contains(".class")) continue;
+                    if (entry.isDirectory() || !entry.getName().endsWith(".class")) continue;
                     paths.add(entry.getName());
                 }
             } else { // Running from IDEs

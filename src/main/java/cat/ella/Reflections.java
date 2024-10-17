@@ -41,13 +41,12 @@ public class Reflections {
         try {
             final File jarFile = new File(callingClass.getProtectionDomain().getCodeSource().getLocation().getPath());
             if (jarFile.isFile()) { // Running from JAR
-                try (JarFile jar = new JarFile(jarFile)) {
-                    paths.addAll(
-                            jar.stream()
-                                    .filter(entry -> !entry.isDirectory())
-                                    .map(JarEntry::getName)
-                                    .collect(Collectors.toSet())
-                    );
+                JarFile jar = new JarFile(jarFile);
+                Enumeration<JarEntry> entries = jar.entries();
+                while (entries.hasMoreElements()) {
+                    JarEntry entry = entries.nextElement();
+                    if (entry.isDirectory() || !entry.getName().contains(".class")) continue;
+                    paths.add(entry.getName());
                 }
             } else { // Running from IDEs
                 InputStream inputStream = callingClass.getClassLoader().getResourceAsStream("");

@@ -43,16 +43,17 @@ public class Reflections {
 
     private Collection<String> captureFilePaths(String localPath) {
         Set<String> paths = new HashSet<>();
+        Set<String> seenPaths = new HashSet<>(); // Track seen paths
+
         try {
             final File jarFile = new File(callingClass.getProtectionDomain().getCodeSource().getLocation().getPath());
             if (jarFile.isFile()) {
                 JarFile jar = new JarFile(jarFile);
                 Enumeration<JarEntry> entries = jar.entries();
+
                 while (entries.hasMoreElements()) {
                     JarEntry entry = entries.nextElement();
-
                     System.out.println(entry.getName());
-
                     paths.add(entry.getName());
                 }
                 jar.close();
@@ -65,7 +66,11 @@ public class Reflections {
                             if (line.contains(".class")) {
                                 paths.add(localPath + line);
                             } else {
-                                paths.addAll(captureFilePaths(localPath + line + "/"));
+                                String newPath = localPath + line + "/";
+                                if (!seenPaths.contains(newPath)) { // Check if path has been seen
+                                    seenPaths.add(newPath); // Mark as seen
+                                    paths.addAll(captureFilePaths(newPath));
+                                }
                             }
                         }
                     }
@@ -74,8 +79,6 @@ public class Reflections {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-
         return paths;
     }
 

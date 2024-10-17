@@ -47,11 +47,13 @@ public class Reflections {
 
         try {
             final File jarFile = new File(callingClass.getProtectionDomain().getCodeSource().getLocation().getPath());
-            try (JarFile jar = new JarFile(jarFile)) {
-                jar.stream().map(JarEntry::getName).forEach(entryName -> {
-                    System.out.println(entryName);
-                    paths.add(entryName);
-                });
+            if (jarFile.isFile()) {
+                try (JarFile jar = new JarFile(jarFile)) {
+                    jar.stream().map(JarEntry::getName).forEach(entryName -> {
+                        System.out.println(entryName);
+                        paths.add(entryName);
+                    });
+                }
             } else { // Running from IDEs
                 InputStream inputStream = getClass().getClassLoader().getResourceAsStream("");
                 if (inputStream != null) {

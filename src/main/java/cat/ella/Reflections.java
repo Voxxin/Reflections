@@ -51,7 +51,7 @@ public class Reflections {
                 try (JarFile jar = new JarFile(jarFile)) {
                     jar.stream().map(JarEntry::getName).forEach(entryName -> {
                         System.out.println(entryName);
-                        paths.add(entryName);
+//                        paths.add(entryName);
                     });
                 }
             } else { // Running from IDEs

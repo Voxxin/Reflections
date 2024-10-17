@@ -43,20 +43,15 @@ public class Reflections {
 
     private Collection<String> captureFilePaths(String localPath) {
         Set<String> paths = new HashSet<>();
-        Set<String> seenPaths = new HashSet<>(); // Track seen paths
+        Set<String> seenPaths = new HashSet<>();
 
         try {
             final File jarFile = new File(callingClass.getProtectionDomain().getCodeSource().getLocation().getPath());
-            if (jarFile.isFile()) {
-                JarFile jar = new JarFile(jarFile);
-                Enumeration<JarEntry> entries = jar.entries();
-
-                while (entries.hasMoreElements()) {
-                    JarEntry entry = entries.nextElement();
-                    System.out.println(entry.getName());
-                    paths.add(entry.getName());
-                }
-                jar.close();
+            try (JarFile jar = new JarFile(jarFile)) {
+                jar.stream().map(JarEntry::getName).forEach(entryName -> {
+                    System.out.println(entryName);
+                    paths.add(entryName);
+                });
             } else { // Running from IDEs
                 InputStream inputStream = getClass().getClassLoader().getResourceAsStream("");
                 if (inputStream != null) {

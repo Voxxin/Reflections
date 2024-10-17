@@ -50,8 +50,7 @@ public class Reflections {
             if (jarFile.isFile()) {
                 try (JarFile jar = new JarFile(jarFile)) {
                     jar.stream().map(JarEntry::getName).forEach(entryName -> {
-                        System.out.println(entryName);
-//                        paths.add(entryName);
+                        paths.add(entryName);
                     });
                 }
             } else { // Running from IDEs
@@ -60,7 +59,7 @@ public class Reflections {
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
                         String line;
                         while ((line = reader.readLine()) != null) {
-                            if (!line.contains(".")) {
+                            if (!line.contains(".")) { // Directories
                                 String newPath = localPath + line + "/";
                                 if (!seenPaths.contains(newPath)) {
                                     seenPaths.add(newPath);

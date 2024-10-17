@@ -49,10 +49,7 @@ public class Reflections {
             final File jarFile = new File(callingClass.getProtectionDomain().getCodeSource().getLocation().getPath());
             if (jarFile.isFile()) {
                 try (JarFile jar = new JarFile(jarFile)) {
-                    jar.stream().map(JarEntry::getName).forEach(entryName -> {
-                        System.out.println(entryName);
-//                        paths.add(entryName);
-                    });
+                    jar.stream().map(JarEntry::getName).filter(s -> s.endsWith(".class")).forEach(paths::add);
                 }
             } else { // Running from IDEs
                 InputStream inputStream = getClass().getClassLoader().getResourceAsStream(localPath);

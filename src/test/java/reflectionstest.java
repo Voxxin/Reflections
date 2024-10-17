@@ -11,8 +11,6 @@ public class reflectionstest {
         Reflections reflections = new Reflections(Reflections.class);
         Collection<Method> methods = reflections.getMethodsAnnotatedWith(Test.class);
 
-        for (Method method : methods) {
-            System.out.println(method.getName());
-        }
+        System.out.println(methods);
     }
 }

@@ -55,19 +55,19 @@ public class Reflections {
                     });
                 }
             } else { // Running from IDEs
-                InputStream inputStream = getClass().getClassLoader().getResourceAsStream("");
+                InputStream inputStream = getClass().getClassLoader().getResourceAsStream(localPath);
                 if (inputStream != null) {
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
                         String line;
                         while ((line = reader.readLine()) != null) {
-                            if (line.contains(".class")) {
-                                paths.add(localPath + line);
-                            } else {
+                            if (!line.contains(".")) { // Directories
                                 String newPath = localPath + line + "/";
-                                if (!seenPaths.contains(newPath)) { // Check if path has been seen
-                                    seenPaths.add(newPath); // Mark as seen
+                                if (!seenPaths.contains(newPath)) {
+                                    seenPaths.add(newPath);
                                     paths.addAll(captureFilePaths(newPath));
                                 }
+                            } else { // Files
+                                paths.add(localPath + line);
                             }
                         }
                     }
